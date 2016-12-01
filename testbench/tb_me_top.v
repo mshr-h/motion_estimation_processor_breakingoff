@@ -25,6 +25,7 @@ localparam SAD_WIDTH = $clog2(TB_LENGTH**2) + PE_OUT_WIDTH;
 reg                  rst_n;
 reg                  clk;
 reg                  req;
+reg  [SAD_WIDTH-1:0] threshold;
 wire [SAD_WIDTH-1:0] min_sad;
 wire [CNT_WIDTH-1:0] min_mvec;
 wire                 ack;
@@ -41,12 +42,13 @@ me_top
   .PE_OUT_WIDTH      ( PE_OUT_WIDTH ) )
 _me_top
 (
-  .rst_n    ( rst_n    ),
-  .clk      ( clk      ),
-  .req      ( req      ),
-  .min_sad  ( min_sad  ),
-  .min_mvec ( min_mvec ),
-  .ack      ( ack      ),
+  .rst_n     ( rst_n     ),
+  .clk       ( clk       ),
+  .req       ( req       ),
+  .threshold ( threshold ),
+  .min_sad   ( min_sad   ),
+  .min_mvec  ( min_mvec  ),
+  .ack       ( ack       ),
 
   // memory access ports
   .pel_sw   ( pel_sw   ),
@@ -90,13 +92,13 @@ initial begin
 end
 
 initial begin
-  #1 rst_n<=1'bx;clk<=1'bx;req<=1'bx;
+  #1 rst_n<=1'bx;clk<=1'bx;req<=1'bx;threshold<={SAD_WIDTH{1'bx}};
   #(CLK_PERIOD) rst_n<=1;
-  #(CLK_PERIOD*3) rst_n<=0;clk<=0;req<=0;
+  #(CLK_PERIOD*3) rst_n<=0;clk<=0;req<=0;threshold<=0;
   repeat(5) @(posedge clk);
   rst_n<=1;
   repeat(3) @(posedge clk);
-  req<=1;
+  req<=1;threshold<=4000;
   while(~ack) @(posedge clk);
   repeat(10) @(posedge clk);
   req<=0;

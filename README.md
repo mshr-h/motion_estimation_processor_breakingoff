@@ -14,7 +14,7 @@ Then, the displacement between the current macro block to the best matching macr
 
 ## Description
 
-- Fullsearch based motion estimation
+- Breakingoff based motion estimation
 - Only integer pixel motion estimation
 - Template Block: 16x16 pixels
 - Search Range  : ±24 pixels

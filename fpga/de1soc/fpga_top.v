@@ -26,6 +26,7 @@ localparam CNT_WIDTH = $clog2((SW_LENGTH-TB_LENGTH+1)**2);
 localparam SAD_WIDTH = $clog2(TB_LENGTH**2) + PE_OUT_WIDTH;
 
 reg                  req;
+reg  [SAD_WIDTH-1:0] threshold;
 wire [SAD_WIDTH-1:0] min_sad;
 wire [CNT_WIDTH-1:0] min_mvec;
 wire                 ack;
@@ -52,7 +53,10 @@ always @(posedge clk or negedge RSTN) begin
   if(~RSTN)
     req <= 0;
   else if(tri_sw4)
-    req <= 1;
+  begin
+    req       <= 1;
+    threshold <= 4000;
+  end
   else if(tri_sw5)
     req <= 0;
 end
@@ -64,18 +68,19 @@ me_top
   .PE_OUT_WIDTH ( PE_OUT_WIDTH )
 ) _me_top
 (
-  .rst_n    ( RSTN     ),
-  .clk      ( clk      ),
-  .req      ( req      ),
-  .min_sad  ( min_sad  ),
-  .min_mvec ( min_mvec ),
-  .ack      ( ack      ),
+  .rst_n     ( RSTN      ),
+  .clk       ( clk       ),
+  .req       ( req       ),
+  .threshold ( threshold ),
+  .min_sad   ( min_sad   ),
+  .min_mvec  ( min_mvec  ),
+  .ack       ( ack       ),
 
   // memory access ports
-  .pel_sw   ( pel_sw   ),
-  .pel_tb   ( pel_tb   ),
-  .addr_sw  ( addr_sw  ),
-  .addr_tb  ( addr_tb  )
+  .pel_sw    ( pel_sw    ),
+  .pel_tb    ( pel_tb    ),
+  .addr_sw   ( addr_sw   ),
+  .addr_tb   ( addr_tb   )
 );
 
 memory_single_port

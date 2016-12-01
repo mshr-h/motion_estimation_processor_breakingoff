@@ -8,6 +8,7 @@ module control_unit
   input  wire                       rst_n,
   input  wire                       clk,
   input  wire                       req,
+  input  wire [SAD_WIDTH-1:0]       threshold,
   input  wire [SAD_WIDTH-1:0]       sad,
   output wire                       clr,
   output wire                       en_addr_sw,
@@ -37,7 +38,7 @@ localparam CNT_PEARRAY_SW_END = SW_LENGTH**2+(SW_LENGTH-TB_LENGTH-1);
 localparam CNT_DUMMY_CYCLE    = SW_LENGTH-TB_LENGTH+7;
 localparam VEC_WIDTH          = $clog2(SW_LENGTH+1);
 
-reg [2:0]         state_main;
+reg [2:0]           state_main;
 reg [CNT_WIDTH-1:0] cnt_min;
 reg [2:0]           state_addr_sw;
 reg [12:0]          cnt_addr_sw;
@@ -68,7 +69,8 @@ always @(posedge clk or negedge rst_n) begin
     case(state_main)
       INIT          :          state_main <= #1 WAIT_REQ;
       WAIT_REQ      : if( req) state_main <= #1 RUNNING;
-      RUNNING       : if(done) state_main <= #1 WAIT_REQ_FALL;
+      RUNNING       : if(done | (min_sad < threshold))
+                               state_main <= #1 WAIT_REQ_FALL;
       WAIT_REQ_FALL : if(~req) state_main <= #1 WAIT_REQ;
       default       :          state_main <= 'dx;
     endcase
